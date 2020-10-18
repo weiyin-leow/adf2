@@ -1,0 +1,15 @@
+{
+	"name": "RestService1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [
+			"message"
+		],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://www.rba.gov.au/rss/rss-cb-exchange-rates.xml",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

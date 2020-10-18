@@ -1,0 +1,44 @@
+{
+	"name": "DataFlowTest001",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureSQLSalesReport",
+						"type": "DatasetReference"
+					},
+					"name": "AzureSQLSalesReport"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SalesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SalesReportByYearCSV"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SalesPersonData"
+				},
+				{
+					"name": "DerivedYearOrderDate"
+				},
+				{
+					"name": "LineSalesTotal"
+				},
+				{
+					"name": "PivotSalesPersonPerYear"
+				},
+				{
+					"name": "SortSalesPersonByName"
+				}
+			],
+			"script": "source(output(\n\t\tCustomerName as string,\n\t\tSalesPerson as string,\n\t\tOrderDate as date,\n\t\tStockItemName as string,\n\t\tQuantity as integer,\n\t\tUnitPrice as decimal(18,2)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> AzureSQLSalesReport\nAzureSQLSalesReport select(mapColumn(\n\t\tSalesPerson,\n\t\tOrderDate,\n\t\tQuantity,\n\t\tUnitPprice = UnitPrice\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> SalesPersonData\nSalesPersonData derive(Year = year(OrderDate)) ~> DerivedYearOrderDate\nDerivedYearOrderDate aggregate(groupBy(SalesPerson,\n\t\tYear),\n\tLineSales = sum(multiply(UnitPprice,Quantity))) ~> LineSalesTotal\nLineSalesTotal pivot(groupBy(SalesPerson),\n\tpivotBy(Year),\n\tSumm = sum(LineSales),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> PivotSalesPersonPerYear\nPivotSalesPersonPerYear sort(asc(SalesPerson, true)) ~> SortSalesPersonByName\nSortSalesPersonByName sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['type 2013-2016_SalesReportByYear'],\n\tpartitionBy('hash', 1)) ~> SalesReportByYearCSV"
+		}
+	}
+}

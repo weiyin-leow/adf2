@@ -1,0 +1,36 @@
+{
+	"name": "dataflow7",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Json6allextrawithlocstring",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "MapDrifted1",
+					"description": "Creates an explicit mapping for each drifted column"
+				},
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "source(output(\n\t\ttype as string,\n\t\tname as string,\n\t\tcrs as (type as string, properties as (name as string)),\n\t\tfeatures as (type as string, properties as (OBJECTID as string, Property as string, Crop_Type as string, Plant_Year as string, State as string, Area_Ha as double, SHAPE_Leng as double, SHAPE_Area as double), geometry as (type as string, coordinates as string))[]\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tsingleQuoted: true,\n\tbackslashEscape: true) ~> source1\nsource1 derive(loc = toString(byName('_corrupt_record'))) ~> MapDrifted1\nMapDrifted1 select(mapColumn(\n\t\tloc\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['corruptdatafromjson.txt'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+		}
+	}
+}

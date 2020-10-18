@@ -1,0 +1,29 @@
+{
+	"name": "Tigermoth_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"dbname": {
+				"type": "String",
+				"defaultValue": "master"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "NFDWHAKV_LS",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "TigermothShort"
+			}
+		},
+		"connectVia": {
+			"referenceName": "IRVM1-SH-integrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

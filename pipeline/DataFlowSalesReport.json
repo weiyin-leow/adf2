@@ -1,0 +1,33 @@
+{
+	"name": "DataFlowSalesReport",
+	"properties": {
+		"activities": [
+			{
+				"name": "DataFlowTest001",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DataFlowTest001",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2019-09-11T07:24:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

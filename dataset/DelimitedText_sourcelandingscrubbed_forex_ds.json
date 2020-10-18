@@ -1,0 +1,52 @@
+{
+	"name": "DelimitedText_sourcelandingscrubbed_forex_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobStore_nfdwhstaging",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{item().TARGET_BLOB_NAME}",
+					"type": "Expression"
+				},
+				"container": "sourcelandingscrubbed"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Date",
+				"type": "String"
+			},
+			{
+				"name": "Base_Currency",
+				"type": "String"
+			},
+			{
+				"name": "Target_Currency",
+				"type": "String"
+			},
+			{
+				"name": "EOM_Rate",
+				"type": "String"
+			},
+			{
+				"name": "Average_Mon_Rate",
+				"type": "String"
+			},
+			{
+				"name": "Type",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

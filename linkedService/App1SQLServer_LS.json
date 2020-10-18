@@ -1,0 +1,18 @@
+{
+	"name": "App1SQLServer_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "NFDWHProdAKV_LS",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "TigermothConn"
+			}
+		}
+	}
+}

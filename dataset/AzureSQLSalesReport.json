@@ -1,0 +1,44 @@
+{
+	"name": "AzureSQLSalesReport",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabaseSample",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CustomerName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SalesPerson",
+				"type": "nvarchar"
+			},
+			{
+				"name": "OrderDate",
+				"type": "date"
+			},
+			{
+				"name": "StockItemName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "UnitPrice",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"tableName": "[dbo].[SalesReport]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

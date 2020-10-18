@@ -1,0 +1,201 @@
+{
+	"name": "ProcessSourceBlobTemplate",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetUnprocessedRowsFromRegister",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT [SOURCE_SYSTEM]\n      ,[PATH_NAME]\n      ,[FILE_NAME]\n      ,CONCAT([PATH_NAME],[FILE_NAME]) AS FULL_PATH_NAME\n      ,[INSERT_TIMESTAMP]\n      ,[PROCESSED_TIMESTAMP]\n      ,[IS_PROCESSED]\n      ,[IS_ARCHIVED]\n      ,[SEQUENCE_TAG]\n  FROM [dbo].[SOURCE_REGISTER_SALES]\n  WHERE [IS_PROCESSED] = 'N'\n  ORDER BY [FILE_NAME], [INSERT_TIMESTAMP];",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SqlSourceRegisterTable",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "CheckAndProcessBlobUpdateRegister",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetUnprocessedRowsFromRegister",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetUnprocessedRowsFromRegister').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "GetBlopPath",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "SourceDelimitedText",
+									"type": "DatasetReference"
+								},
+								"fieldList": [
+									"itemName",
+									"exists"
+								],
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							}
+						},
+						{
+							"name": "IsPhysicalFileExist",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "GetBlopPath",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@activity('GetBlopPath').output.exists",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "UpdateSourceRegisterFailed",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[UpdateSourceRegisterFailed]",
+											"storedProcedureParameters": {
+												"FileName": {
+													"value": {
+														"value": "@{item().FILE_NAME}",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabaseSample",
+											"type": "LinkedServiceReference"
+										}
+									},
+									{
+										"name": "Abort",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [
+											{
+												"activity": "UpdateSourceRegisterFailed",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "sp_executesql",
+											"storedProcedureParameters": {
+												"stmt": {
+													"value": "Declare @err_msg NVARCHAR(150)SET @err_msg=N'Error occurred in this pipeline somehow somewhere something. Best regards. EXISTSCheers'RAISERROR(@err_msg,15,1)",
+													"type": "string"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabaseSample",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "UpdateSourceRegisterPassed",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[UpdateSourceRegisterPassed]",
+											"storedProcedureParameters": {
+												"FileName": {
+													"value": {
+														"value": "@{item().FILE_NAME}",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabaseSample",
+											"type": "LinkedServiceReference"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2019-09-11T07:39:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

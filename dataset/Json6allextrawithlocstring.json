@@ -1,0 +1,97 @@
+{
+	"name": "Json6allextrawithlocstring",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SourceBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Border_Plantation_20190315_dataonlyallextra.json",
+				"container": "blobcontainer"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"crs": {
+					"type": "object",
+					"properties": {
+						"type": {
+							"type": "string"
+						},
+						"properties": {
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"features": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"type": {
+								"type": "string"
+							},
+							"properties": {
+								"type": "object",
+								"properties": {
+									"OBJECTID": {
+										"type": "integer"
+									},
+									"Property": {
+										"type": "string"
+									},
+									"Crop_Type": {
+										"type": "string"
+									},
+									"Plant_Year": {
+										"type": "integer"
+									},
+									"State": {
+										"type": "string"
+									},
+									"Area_Ha": {
+										"type": "number"
+									},
+									"SHAPE_Leng": {
+										"type": "number"
+									},
+									"SHAPE_Area": {
+										"type": "number"
+									}
+								}
+							},
+							"geometry": {
+								"type": "object",
+								"properties": {
+									"type": {
+										"type": "string"
+									},
+									"coordinates": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

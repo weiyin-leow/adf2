@@ -1,0 +1,38 @@
+{
+	"name": "Json3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SourceBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Border_Plantation_testNoCoordinate.json",
+				"container": "blobcontainer"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"type1": {
+					"type": "string"
+				},
+				"properties1": {
+					"type": "object",
+					"properties": {
+						"OBJECTID": {
+							"type": "integer"
+						},
+						"Property": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

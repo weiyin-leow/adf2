@@ -1,0 +1,77 @@
+{
+	"name": "SQLrelationforex_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLdbConnection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Forex_Date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Base_Currency",
+				"type": "varchar"
+			},
+			{
+				"name": "Target_Currency",
+				"type": "varchar"
+			},
+			{
+				"name": "EOM_Rate",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 7
+			},
+			{
+				"name": "Avg_Mon_Rate",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 7
+			},
+			{
+				"name": "start_datetime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "end_datetime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "record_deleted_flag",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "process_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Forex_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Base_Currency_B",
+				"type": "varchar"
+			},
+			{
+				"name": "Target_Currency_B",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "relational",
+			"table": "Forex_Rate"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

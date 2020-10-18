@@ -1,0 +1,107 @@
+{
+	"name": "ProcessOpsWorkbookSendMailRunStart_pl",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetEmailDetails",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT 'Operations workbook submitted' AS Message_Header,\nCONCAT('Hi ',Ops_Representative_First_Name) AS Message_1,\nCONCAT('Thank you for submitting ','\\\"','@{pipeline().parameters.WorkbookName}','\\\". This is now being processed and we will be in contact shortly to confirm processing is complete.<br>') AS Message_2,\nCONCAT('Regards,','<br><br>','New Forests Operations Team') AS Message_3,\nOps_Representative_Email, Ops_Representative_Last_Name, Ops_Representative_First_Name\nFROM (\nSELECT DISTINCT ra.Ops_Representative_First_Name, ra.Ops_Representative_Last_Name, ra.Ops_Representative_Email\nFROM relational.Asset ra \nWHERE record_deleted_flag = 0 \nAND ra.Asset_ID = '@{pipeline().parameters.Asset_ID}' \nAND ra.Fund_ID = '@{pipeline().parameters.Fund_ID}'\n)z;",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQLauditopsworkbookworksheetlist_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachWorkbookWorksheetEmail",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetEmailDetails",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetEmailDetails').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "SendEmail",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": "https://prod-23.australiaeast.logic.azure.com:443/workflows/b671ebc75c434430a109e8f0bd315f64/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=apYrNf6IklZ93yvOSxdp4SN4MnbNnQCeafpOV61y-q4",
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "{\n\"messageHeader\":\"@{item().Message_Header}\",\n\"message1\":\"@{item().Message_1}\",\n\"message2\":\"\",\n\"message3\":\"@{item().Message_2}\",\n\"message4\":\"@{item().Message_3}\",\n\"message5\":\"\",\n\"message6\":\"\",\n\"emailAddress\":\"@{item().Ops_Representative_Email}\",\n\"lastName\":\"\",\n\"firstName\":\"\"\n}",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"DataFactoryName": {
+				"type": "string",
+				"defaultValue": "myFactory"
+			},
+			"PipelineName": {
+				"type": "string",
+				"defaultValue": "myPipeline"
+			},
+			"WorkbookName": {
+				"type": "string",
+				"defaultValue": "Wenita Forestry Products Q4 FY20 test.xlsx"
+			},
+			"Asset_ID": {
+				"type": "string",
+				"defaultValue": "WFP"
+			},
+			"Fund_ID": {
+				"type": "string",
+				"defaultValue": "ANZFOF2"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-10-17T14:17:03Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

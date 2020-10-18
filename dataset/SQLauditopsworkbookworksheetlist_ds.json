@@ -1,0 +1,38 @@
+{
+	"name": "SQLauditopsworkbookworksheetlist_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLdbConnection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Work_Book",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Work_Sheet",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Asset_Id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Fund_Id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CurrentQuarterDate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "audit",
+			"table": "OPS_Workbook_Worksheet_Asset_List"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,26 @@
+{
+	"name": "SourceDelimitedText",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DueToFuncApps",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{item().FILE_NAME}",
+					"type": "Expression"
+				},
+				"container": "blobcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
